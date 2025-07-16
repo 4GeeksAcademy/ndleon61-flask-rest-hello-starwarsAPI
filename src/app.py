@@ -8,7 +8,7 @@ from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from admin import setup_admin
-from models import db, User
+from models import db, User, People, Planet, Favorite
 #from models import Person
 
 app = Flask(__name__)
@@ -49,3 +49,53 @@ def handle_hello():
 if __name__ == '__main__':
     PORT = int(os.environ.get('PORT', 3000))
     app.run(host='0.0.0.0', port=PORT, debug=False)
+
+#Gets all people
+@app.route('/people', methods = ['GET'])
+def get_all_people():
+    people = People.query.all()
+    serialized_people = [person.serialize() for person in people]
+    return jsonify(serialized_people), 200
+
+#Gets one person
+@app.route('/people/<int:id>', methods = ['GET'])
+def get_one_person(id):
+    person = People.query.get(id)
+
+    if person is None:
+        return jsonify({"error": "Person not found"}), 404
+    return jsonify(person.serialize()), 200
+
+#Gets all planets
+@app.route('/planet', methods = ['GET'])
+def get_planet():
+    planets = Planet.query.all()
+    serialized_planets = [p.serialize() for p in planets]
+    return jsonify(serialized_planets), 200
+
+
+#Gets one planet
+@app.route('/planet/<int:id>', methods = ['GET'])
+def get_one_planet(id):
+    planet = Planet.query.get(id)
+
+    if planet is None:
+        return jsonify({"error": "Unable to find planet"}), 404
+    return jsonify(planet.serialize()), 200
+
+#Gets all favorites
+@app.route('/favorites', methods = ['GET'])
+def get_all_favorite():
+    favorites = Favorite.query.all()
+    serialized_favorites = [f.serialize() for f in favorites]
+    return jsonify(serialized_favorites), 200
+
+
+# Gets one favorite
+@app.route('/favorites/<int:id>', methods = ['GET'])
+def get_one_favorite(id):
+    favorite = Favorite.query.get(id)
+
+    if favorite is None:
+        return jsonify({"error": "Favorite not found"}), 404
+    return jsonify(favorite.serialize()), 200
